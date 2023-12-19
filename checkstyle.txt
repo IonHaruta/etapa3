@@ -1,0 +1,4 @@
+Starting audit...
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/main/Main.java:78: Line is longer than 100 characters (found 118). [LineLength]
+Audit done.
+Checkstyle ends with 1 errors.
