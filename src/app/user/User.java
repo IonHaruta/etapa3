@@ -1,5 +1,6 @@
 package app.user;
 
+import app.audio.Collections.Album;
 import app.audio.Collections.AudioCollection;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.PlaylistOutput;
@@ -18,7 +19,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The type User.
@@ -45,6 +48,28 @@ public final class User extends UserAbstract {
     @Getter
     @Setter
     private LikedContentPage likedContentPage;
+    @Getter
+    @Setter
+    private Map<String, Integer> artistNames = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Integer> genreName = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Integer> songName = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Integer> albumName = new HashMap<>();
+    @Getter
+    @Setter
+    private String currentSong = new String();
+    @Setter
+    @Getter
+    private List<String> songList = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<Map<String, Integer>> result = new ArrayList<>();
+
 
     /**
      * Instantiates a new User.
@@ -66,6 +91,10 @@ public final class User extends UserAbstract {
         homePage = new HomePage(this);
         currentPage = homePage;
         likedContentPage = new LikedContentPage(this);
+    }
+
+    public void getStatisticsUser(){
+
     }
 
     @Override
@@ -142,6 +171,16 @@ public final class User extends UserAbstract {
         }
     }
 
+    private static void incrementMap(Map<String, Integer> map, String key) {
+        map.compute(key, (k, oldValue) -> (oldValue == null) ? 1 : oldValue + 1);
+    }
+    private static void printMap(String category, Map<String, Integer> map) {
+        System.out.println(category + ":");
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+        System.out.println(); // Add an empty line for better readability
+    }
     /**
      * Load string.
      *
@@ -162,6 +201,25 @@ public final class User extends UserAbstract {
         }
 
         player.setSource(searchBar.getLastSelected(), searchBar.getLastSearchType());
+        //------
+        String album = ((Song) player.getSource().getAudioFile()).getAlbum();
+        String genre = ((Song) player.getSource().getAudioFile()).getGenre();
+        String artist = ((Song) player.getSource().getAudioFile()).getArtist();
+        String song = (player.getSource().getAudioFile()).getName();
+
+
+
+        if (player.getType().equals("song")) {
+            incrementMap(albumName, album);
+            incrementMap(genreName, genre);
+            incrementMap(artistNames, artist);
+            incrementMap(songName, song);
+        }
+        printMap("Albums", albumName);
+        printMap("Genres", genreName);
+        printMap("Artists", artistNames);
+        printMap("Songs", songName);
+        //------
         searchBar.clearSelection();
 
         player.pause();
@@ -587,6 +645,42 @@ public final class User extends UserAbstract {
             return;
         }
 
+        if (player.getSource() != null && player.getType().equals("album")) {
+            boolean isSongCurrentSong = false;
+            int exitPoint = 0;
+            for (Song name : ((Album) player.getSource().getAudioCollection()).getSongs()) {
+                if (name.getName().equals(currentSong)) {
+                    isSongCurrentSong = true;
+                } else if (isSongCurrentSong && exitPoint == 0){
+                    continue;
+                }
+                if (isSongCurrentSong) {
+                    incrementMap(albumName, ((Song) player.getSource().getAudioFile()).getAlbum());
+                    incrementMap(genreName, ((Song) player.getSource().getAudioFile()).getGenre());
+                    incrementMap(artistNames, ((Song) player.getSource().getAudioFile()).getArtist());
+                    incrementMap(songName, (player.getSource().getAudioFile()).getName());
+                    exitPoint++;
+                }
+            }
+            currentSong = player.getSource().getAudioFile().getName();
+        }
+
+        // if currentSong == null : add.song in list
+        //list add song names
+        // foreach in lista de song names, si incrementez daca name,gnere,artist,album == name din map
+        // 1 2 3 4 5 6 7 8
+        //       4 .......
+        // boolean = false
+        // if song != currentSong : continue ? boolean = true
+
+//        if (player.getType().equals("album")) {
+//            incrementMap(albumName, album);
+//            incrementMap(genreName, genre);
+//            incrementMap(artistNames, artist);
+//            incrementMap(songName, song);
+//        }
+        // String lastListened = player.source....getSongName()
+        // String currentSong = player.source....getSongName()
         player.simulatePlayer(time);
     }
 }

@@ -136,6 +136,7 @@ public final class Main {
                 case "getOnlineUsers" -> outputs.add(CommandRunner.getOnlineUsers(command));
                 case "showAlbums" -> outputs.add(CommandRunner.showAlbums(command));
                 case "showPodcasts" -> outputs.add(CommandRunner.showPodcasts(command));
+                case "wrapped" -> outputs.add(CommandRunner.showPodcasts(command));
                 default -> System.out.println("Invalid command " + commandName);
             }
         }

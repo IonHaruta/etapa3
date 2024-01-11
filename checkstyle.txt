@@ -1,4 +1,15 @@
 Starting audit...
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/CommandRunner.java:592:26: '{' is not preceded with whitespace. [WhitespaceAround]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/CommandRunner.java:799:5: Missing a Javadoc comment. [MissingJavadocMethod]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:96:5: Missing a Javadoc comment. [MissingJavadocMethod]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:96:36: '{' is not preceded with whitespace. [WhitespaceAround]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:174:38: Parameter map should be final. [FinalParameters]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:174:64: Parameter key should be final. [FinalParameters]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:177:34: Parameter category should be final. [FinalParameters]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:177:51: Parameter map should be final. [FinalParameters]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:654:64: '{' is not preceded with whitespace. [WhitespaceAround]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:660: Line is longer than 100 characters (found 102). [LineLength]
+[ERROR] /Users/ionharuta/Desktop/etapa3/./src/app/user/User.java:670: Line is longer than 100 characters (found 102). [LineLength]
 [ERROR] /Users/ionharuta/Desktop/etapa3/./src/main/Main.java:78: Line is longer than 100 characters (found 118). [LineLength]
 Audit done.
-Checkstyle ends with 1 errors.
+Checkstyle ends with 12 errors.

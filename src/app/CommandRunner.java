@@ -588,7 +588,10 @@ public final class CommandRunner {
      */
     public static ObjectNode showPodcasts(final CommandInput commandInput) {
         Host host = admin.getHost(commandInput.getUsername());
-        List<PodcastOutput> podcasts = host.getPodcasts().stream().map(PodcastOutput::new).toList();
+        List<PodcastOutput> podcasts = new ArrayList<>();
+        if (host != null){
+            podcasts = host.getPodcasts().stream().map(PodcastOutput::new).toList();
+        }
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
@@ -778,6 +781,32 @@ public final class CommandRunner {
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("result", objectMapper.valueToTree(playlists));
+
+        return objectNode;
+    }
+
+//    public static ObjectNode getTop5Genre(final CommandInput commandInput) {
+//        List<String> genre = admin.getTop5Genre();
+//
+//        ObjectNode objectNode = objectMapper.createObjectNode();
+//        objectNode.put("command", commandInput.getCommand());
+//        objectNode.put("timestamp", commandInput.getTimestamp());
+//        objectNode.put("result", objectMapper.valueToTree(genre));
+//
+//        return objectNode;
+//    }
+
+    public static ObjectNode getStatisticsUser(final CommandInput commandInput) {
+        List<String> artistList = admin.getTop5ArtistList();
+//        List<String> genreList = admin.getTop5Genre();
+//        List<String> songs = admin.getTop5Songs();
+//        List<String> albumList = admin.getTop5AlbumList();
+
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(artistList));
 
         return objectNode;
     }

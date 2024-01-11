@@ -873,4 +873,39 @@ public final class Admin {
         }
         return topPlaylists;
     }
+
+//    public List<String> getTop5Genre() {
+//        Map<String, Integer> genreCounts = new HashMap<>();
+//
+//        for (Song song : songs) {
+//            String genre = song.getGenre();
+//            genreCounts.put(genre, genreCounts.getOrDefault(genre, 0) + 1);
+//        }
+//
+//        List<Map.Entry<String, Integer>> sortedGenres = genreCounts.entrySet().stream()
+//                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+//                .collect(Collectors.toList());
+//
+//        List<String> topGenres = sortedGenres.stream()
+//                .limit(5)
+//                .map(Map.Entry::getKey)
+//                .collect(Collectors.toList());
+//
+//        return topGenres;
+//    }
+//    public List<String> getTop5Podcasts() {
+//        List<Podcast> podcasts = hosts.stream().map(Host::getPodcasts)
+//                .flatMap(List::stream).toList();
+//
+//        final Map<Album, Integer> podcastLikes = new HashMap<>();
+//        podcasts.forEach(podcast -> podcastLikes.put(podcast, podcast.getEpisodes().stream()
+//                .map(Episode::getDescription).reduce(0, Integer::sum)));
+//
+//        return podcasts.stream().sorted((o1, o2) -> {
+//            if ((int) podcastLikes.get(o1) == podcastLikes.get(o2)) {
+//                return o1.getName().compareTo(o2.getName());
+//            }
+//            return podcastLikes.get(o2) - podcastLikes.get(o1);
+//        }).limit(limit).map(Podcast::getName).toList();
+//    }
 }
