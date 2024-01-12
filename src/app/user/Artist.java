@@ -1,12 +1,17 @@
 package app.user;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
 import app.audio.Files.Song;
 import app.pages.ArtistPage;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import fileio.input.CommandInput;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The type Artist.
@@ -15,6 +20,7 @@ public final class Artist extends ContentCreator {
     private ArrayList<Album> albums;
     private ArrayList<Merchandise> merch;
     private ArrayList<Event> events;
+    private final int wrappedLimit = 5;
 
     /**
      * Instantiates a new Artist.
@@ -75,6 +81,10 @@ public final class Artist extends ContentCreator {
         return null;
     }
 
+    public void incrementMap(Map<String, Integer> map, String key) {
+        map.compute(key, (k, oldValue) -> (oldValue == null) ? 1 : oldValue + 1);
+    }
+
     /**
      * Gets album.
      *
@@ -115,6 +125,14 @@ public final class Artist extends ContentCreator {
         }
 
         return albumOutput;
+    }
+
+    public ObjectNode wrapped(final CommandInput command) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+
+
+        return objectNode;
     }
 
     /**

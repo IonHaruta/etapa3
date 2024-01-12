@@ -43,7 +43,6 @@ public final class Player {
 
         repeatMode = Enums.RepeatMode.NO_REPEAT;
         paused = true;
-        source = null;
         shuffle = false;
     }
 
@@ -51,8 +50,8 @@ public final class Player {
         if (source != null && source.getAudioFile() != null) {
             PodcastBookmark currentBookmark =
                     new PodcastBookmark(source.getAudioCollection().getName(),
-                                        source.getIndex(),
-                                        source.getDuration());
+                            source.getIndex(),
+                            source.getDuration());
             bookmarks.removeIf(bookmark -> bookmark.getName().equals(currentBookmark.getName()));
             bookmarks.add(currentBookmark);
         }
@@ -128,7 +127,7 @@ public final class Player {
         }
 
         if (source.getType() == Enums.PlayerSourceType.PLAYLIST
-            || source.getType() == Enums.PlayerSourceType.ALBUM) {
+                || source.getType() == Enums.PlayerSourceType.ALBUM) {
             shuffle = !shuffle;
             if (shuffle) {
                 source.updateShuffleIndex();

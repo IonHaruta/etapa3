@@ -184,9 +184,9 @@ public final class SearchBar {
 
                 if (filters.getName() != null) {
                     entries.removeIf(contentCreator
-                                        -> !contentCreator.getUsername().toLowerCase()
-                                                          .startsWith(filters.getName()
-                                                          .toLowerCase()));
+                            -> !contentCreator.getUsername().toLowerCase()
+                            .startsWith(filters.getName()
+                                    .toLowerCase()));
                 }
 
                 break;
@@ -195,9 +195,9 @@ public final class SearchBar {
 
                 if (filters.getName() != null) {
                     entries.removeIf(contentCreator
-                                        -> !contentCreator.getUsername().toLowerCase()
-                                                          .startsWith(filters.getName()
-                                                          .toLowerCase()));
+                            -> !contentCreator.getUsername().toLowerCase()
+                            .startsWith(filters.getName()
+                                    .toLowerCase()));
                 }
 
                 break;

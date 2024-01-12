@@ -8,6 +8,7 @@ import app.searchBar.Filters;
 import app.user.Artist;
 import app.user.Host;
 import app.user.User;
+import app.user.UserAbstract;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.input.CommandInput;
@@ -264,7 +265,7 @@ public final class CommandRunner {
     public static ObjectNode createPlaylist(final CommandInput commandInput) {
         User user = admin.getUser(commandInput.getUsername());
         String message = user.createPlaylist(commandInput.getPlaylistName(),
-                                             commandInput.getTimestamp());
+                commandInput.getTimestamp());
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
@@ -602,6 +603,32 @@ public final class CommandRunner {
         return objectNode;
     }
 
+    public static ObjectNode wrapped(final CommandInput commandInput) {
+        ObjectNode resultNode = objectMapper.createObjectNode();
+        UserAbstract user = admin.getAbstractUser(commandInput.getUsername());
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        if (user == null) {
+            return null;
+        } else if (user.userType().equals("user")) {
+            resultNode = ((User)user).wrapped(commandInput);
+            if (resultNode == null) {
+                objectNode.put("message", "No data to show for user " + commandInput.getUsername() + ".");
+                return objectNode;
+            }
+        } else if (user.userType().equals("artist")) {
+            resultNode = ((Artist)user).wrapped(commandInput);
+        } else if (user.userType().equals("host")) {
+            resultNode = ((Host)user).wrapped(commandInput);
+        }
+        objectNode.put("result", resultNode);
+
+        return objectNode;
+    }
+
     /**
      * Add merch object node.
      *
@@ -785,29 +812,4 @@ public final class CommandRunner {
         return objectNode;
     }
 
-//    public static ObjectNode getTop5Genre(final CommandInput commandInput) {
-//        List<String> genre = admin.getTop5Genre();
-//
-//        ObjectNode objectNode = objectMapper.createObjectNode();
-//        objectNode.put("command", commandInput.getCommand());
-//        objectNode.put("timestamp", commandInput.getTimestamp());
-//        objectNode.put("result", objectMapper.valueToTree(genre));
-//
-//        return objectNode;
-//    }
-
-    public static ObjectNode getStatisticsUser(final CommandInput commandInput) {
-        List<String> artistList = admin.getTop5ArtistList();
-//        List<String> genreList = admin.getTop5Genre();
-//        List<String> songs = admin.getTop5Songs();
-//        List<String> albumList = admin.getTop5AlbumList();
-
-
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("command", commandInput.getCommand());
-        objectNode.put("timestamp", commandInput.getTimestamp());
-        objectNode.put("result", objectMapper.valueToTree(artistList));
-
-        return objectNode;
-    }
 }

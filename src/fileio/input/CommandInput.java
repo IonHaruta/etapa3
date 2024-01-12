@@ -13,6 +13,7 @@ public final class CommandInput {
     private Integer playlistId; // pentru add/remove song
     private String playlistName; // pentru create playlist
     private Integer seed; // pentru shuffle
+    private String recommendationType;
 
     private int age;
     private String city;
@@ -27,6 +28,15 @@ public final class CommandInput {
 
     public CommandInput() {
     }
+
+    public String getRecommendationType() {
+        return recommendationType;
+    }
+
+    public void setRecommendationType(String recommendationType) {
+        this.recommendationType = recommendationType;
+    }
+
     public String getType() {
         return type;
     }

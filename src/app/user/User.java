@@ -1,5 +1,6 @@
 package app.user;
 
+import app.Admin;
 import app.audio.Collections.Album;
 import app.audio.Collections.AudioCollection;
 import app.audio.Collections.Playlist;
@@ -15,13 +16,13 @@ import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.utils.Enums;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import fileio.input.CommandInput;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The type User.
@@ -62,13 +63,14 @@ public final class User extends UserAbstract {
     private Map<String, Integer> albumName = new HashMap<>();
     @Getter
     @Setter
-    private String currentSong = new String();
+    private String currentSong = null;
     @Setter
     @Getter
     private List<String> songList = new ArrayList<>();
     @Getter
     @Setter
     private List<Map<String, Integer>> result = new ArrayList<>();
+    private final int wrappedLimit = 5;
 
 
     /**
@@ -118,7 +120,7 @@ public final class User extends UserAbstract {
 
         if (type.equals("artist") || type.equals("host")) {
             List<ContentCreator> contentCreatorsEntries =
-            searchBar.searchContentCreator(filters, type);
+                    searchBar.searchContentCreator(filters, type);
 
             for (ContentCreator contentCreator : contentCreatorsEntries) {
                 results.add(contentCreator.getUsername());
@@ -151,7 +153,7 @@ public final class User extends UserAbstract {
         lastSearched = false;
 
         if (searchBar.getLastSearchType().equals("artist")
-            || searchBar.getLastSearchType().equals("host")) {
+                || searchBar.getLastSearchType().equals("host")) {
             ContentCreator selected = searchBar.selectContentCreator(itemNumber);
 
             if (selected == null) {
@@ -171,7 +173,7 @@ public final class User extends UserAbstract {
         }
     }
 
-    private static void incrementMap(Map<String, Integer> map, String key) {
+    public void incrementMap(Map<String, Integer> map, String key) {
         map.compute(key, (k, oldValue) -> (oldValue == null) ? 1 : oldValue + 1);
     }
     private static void printMap(String category, Map<String, Integer> map) {
@@ -196,29 +198,22 @@ public final class User extends UserAbstract {
         }
 
         if (!searchBar.getLastSearchType().equals("song")
-            && ((AudioCollection) searchBar.getLastSelected()).getNumberOfTracks() == 0) {
+                && ((AudioCollection) searchBar.getLastSelected()).getNumberOfTracks() == 0) {
             return "You can't load an empty audio collection!";
         }
-
+        currentSong = null;
         player.setSource(searchBar.getLastSelected(), searchBar.getLastSearchType());
-        //------
-        String album = ((Song) player.getSource().getAudioFile()).getAlbum();
-        String genre = ((Song) player.getSource().getAudioFile()).getGenre();
-        String artist = ((Song) player.getSource().getAudioFile()).getArtist();
-        String song = (player.getSource().getAudioFile()).getName();
-
-
-
+        //----------------
         if (player.getType().equals("song")) {
+            String album = ((Song) player.getSource().getAudioFile()).getAlbum();
+            String genre = ((Song) player.getSource().getAudioFile()).getGenre();
+            String artistName = ((Song) player.getSource().getAudioFile()).getArtist();
+            String song = (player.getSource().getAudioFile()).getName();
             incrementMap(albumName, album);
             incrementMap(genreName, genre);
-            incrementMap(artistNames, artist);
+            incrementMap(artistNames, artistName);
             incrementMap(songName, song);
         }
-        printMap("Albums", albumName);
-        printMap("Genres", genreName);
-        printMap("Artists", artistNames);
-        printMap("Songs", songName);
         //------
         searchBar.clearSelection();
 
@@ -307,7 +302,7 @@ public final class User extends UserAbstract {
         }
 
         if (!player.getType().equals("playlist")
-            && !player.getType().equals("album")) {
+                && !player.getType().equals("album")) {
             return "The loaded source is not a playlist or an album.";
         }
 
@@ -380,7 +375,7 @@ public final class User extends UserAbstract {
         }
 
         if (!player.getType().equals("song") && !player.getType().equals("playlist")
-            && !player.getType().equals("album")) {
+                && !player.getType().equals("album")) {
             return "Loaded source is not a song.";
         }
 
@@ -600,6 +595,96 @@ public final class User extends UserAbstract {
         return results;
     }
 
+    public ObjectNode wrapped(final CommandInput command) {
+        if (artistNames.isEmpty() || genreName.isEmpty() || songName.isEmpty()
+                || albumName.isEmpty()) {
+            return null;
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+
+        ObjectNode node = objectMapper.createObjectNode();
+        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(artistNames.entrySet());
+
+        entryList.sort(Map.Entry.<String, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey()));
+
+        Map<String, Integer> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        for (int i = 0; i < wrappedLimit; i++) {
+            if (sortedMap.size() <= i)
+                break;
+
+            node.put(sortedMap.keySet().toArray()[i].toString(),
+                    (Integer) sortedMap.values().toArray()[i]);
+        }
+        objectNode.set("topArtists", node);
+
+        ObjectNode node1 = objectMapper.createObjectNode();
+
+        List<Map.Entry<String, Integer>> entryList1 = new ArrayList<>(genreName.entrySet());
+
+        entryList1.sort(Map.Entry.<String, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey()));
+
+        Map<String, Integer> sortedMap1 = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList1) {
+            sortedMap1.put(entry.getKey(), entry.getValue());
+        }
+        for (int i = 0; i < wrappedLimit; i++) {
+            if (sortedMap1.size() <= i)
+                break;
+
+            node1.put(sortedMap1.keySet().toArray()[i].toString(),
+                    (Integer) sortedMap1.values().toArray()[i]);
+        }
+        objectNode.set("topGenres", node1);
+
+        ObjectNode node2 = objectMapper.createObjectNode();
+        List<Map.Entry<String, Integer>> entryList2 = new ArrayList<>(songName.entrySet());
+
+        entryList2.sort(Map.Entry.<String, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey()));
+
+        Map<String, Integer> sortedMap2 = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList2) {
+            sortedMap2.put(entry.getKey(), entry.getValue());
+        }
+        for (int i = 0; i < wrappedLimit; i++) {
+            if (sortedMap2.size() <= i)
+                break;
+
+            node2.put(sortedMap2.keySet().toArray()[i].toString(),
+                    (Integer) sortedMap2.values().toArray()[i]);
+        }
+        objectNode.set("topSongs", node2);
+
+        ObjectNode node3 = objectMapper.createObjectNode();
+        List<Map.Entry<String, Integer>> entryList3 = new ArrayList<>(albumName.entrySet());
+
+        entryList3.sort(Map.Entry.<String, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey()));
+
+        Map<String, Integer> sortedMap3 = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList3) {
+            sortedMap3.put(entry.getKey(), entry.getValue());
+        }
+        for (int i = 0; i < wrappedLimit; i++) {
+            if (sortedMap3.size() <= i)
+                break;
+
+            node3.put(sortedMap3.keySet().toArray()[i].toString(),
+                    (Integer) sortedMap3.values().toArray()[i]);
+        }
+        objectNode.set("topAlbums", node3);
+
+        ObjectNode node4 = objectMapper.createObjectNode();
+        objectNode.set("topPodcasts", node4);
+        return objectNode;
+    }
+
     /**
      * Gets preferred genre.
      *
@@ -645,42 +730,44 @@ public final class User extends UserAbstract {
             return;
         }
 
+        player.simulatePlayer(time);
         if (player.getSource() != null && player.getType().equals("album")) {
-            boolean isSongCurrentSong = false;
-            int exitPoint = 0;
-            for (Song name : ((Album) player.getSource().getAudioCollection()).getSongs()) {
-                if (name.getName().equals(currentSong)) {
-                    isSongCurrentSong = true;
-                } else if (isSongCurrentSong && exitPoint == 0){
-                    continue;
+            Admin admin = Admin.getInstance();
+            boolean exit = false;
+            if (currentSong != null) {
+                boolean isSongCurrentSong = false;
+                for (Song name : ((Album) player.getSource().getAudioCollection()).getSongs()) {
+                    if (isSongCurrentSong) {
+                        incrementMap(albumName, name.getAlbum());
+                        incrementMap(genreName, name.getGenre());
+                        incrementMap(artistNames, name.getArtist());
+                        incrementMap(songName, name.getName());
+                    }
+                    if (name.getName().equals(currentSong)) {
+                        isSongCurrentSong = true;
+                    }
+                    if (name.getName().equals(player.getSource().getAudioFile().getName())) {
+                        exit = true;
+                        break;
+                    }
                 }
-                if (isSongCurrentSong) {
-                    incrementMap(albumName, ((Song) player.getSource().getAudioFile()).getAlbum());
-                    incrementMap(genreName, ((Song) player.getSource().getAudioFile()).getGenre());
-                    incrementMap(artistNames, ((Song) player.getSource().getAudioFile()).getArtist());
-                    incrementMap(songName, (player.getSource().getAudioFile()).getName());
-                    exitPoint++;
+            } else {
+                for (Song name : ((Album) player.getSource().getAudioCollection()).getSongs()) {
+                    incrementMap(albumName, name.getAlbum());
+                    incrementMap(genreName, name.getGenre());
+                    incrementMap(artistNames, name.getArtist());
+                    incrementMap(songName, name.getName());
+                    if (name.getName().equals(player.getSource().getAudioFile().getName())) {
+                        exit = true;
+                        break;
+                    }
                 }
             }
-            currentSong = player.getSource().getAudioFile().getName();
+            if (exit) {
+                currentSong = player.getSource().getAudioFile().getName();
+            } else {
+                currentSong = null;
+            }
         }
-
-        // if currentSong == null : add.song in list
-        //list add song names
-        // foreach in lista de song names, si incrementez daca name,gnere,artist,album == name din map
-        // 1 2 3 4 5 6 7 8
-        //       4 .......
-        // boolean = false
-        // if song != currentSong : continue ? boolean = true
-
-//        if (player.getType().equals("album")) {
-//            incrementMap(albumName, album);
-//            incrementMap(genreName, genre);
-//            incrementMap(artistNames, artist);
-//            incrementMap(songName, song);
-//        }
-        // String lastListened = player.source....getSongName()
-        // String currentSong = player.source....getSongName()
-        player.simulatePlayer(time);
     }
 }

@@ -2,6 +2,8 @@ package app.user;
 
 import app.audio.Collections.Podcast;
 import app.pages.HostPage;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import fileio.input.CommandInput;
 
 import java.util.ArrayList;
 
@@ -92,6 +94,10 @@ public final class Host extends ContentCreator {
             }
         }
 
+        return null;
+    }
+
+    public ObjectNode wrapped(final CommandInput command) {
         return null;
     }
 
