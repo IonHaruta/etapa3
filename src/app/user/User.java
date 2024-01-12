@@ -213,6 +213,17 @@ public final class User extends UserAbstract {
             incrementMap(genreName, genre);
             incrementMap(artistNames, artistName);
             incrementMap(songName, song);
+            Admin admin = Admin.getInstance();
+            Artist artist = admin.getArtist(artistName);
+            if (artist == null) {
+                admin.addArtist(artistName);
+                artist = admin.getArtist(artistName);
+            }
+            artist.incrementMap(artist.getBestAlbums(), album);
+            artist.incrementMap(artist.getBestSongs(), song);
+            artist.incrementMap(artist.getBestFans(), getUsername());
+            artist.incrementMap(artist.getListeners(), getUsername());
+            artist.incrementMap(artist.getCities(), getCity());
         }
         //------
         searchBar.clearSelection();
@@ -734,6 +745,7 @@ public final class User extends UserAbstract {
         if (player.getSource() != null && player.getType().equals("album")) {
             Admin admin = Admin.getInstance();
             boolean exit = false;
+            Artist artist = admin.getArtist(player.getSource().getAudioCollection().getOwner());
             if (currentSong != null) {
                 boolean isSongCurrentSong = false;
                 for (Song name : ((Album) player.getSource().getAudioCollection()).getSongs()) {
@@ -742,6 +754,15 @@ public final class User extends UserAbstract {
                         incrementMap(genreName, name.getGenre());
                         incrementMap(artistNames, name.getArtist());
                         incrementMap(songName, name.getName());
+                        if (artist == null) {
+                            admin.addArtist(name.getArtist());
+                            artist = admin.getArtist(name.getArtist());
+                        }
+                        artist.incrementMap(artist.getBestAlbums(), name.getAlbum());
+                        artist.incrementMap(artist.getBestSongs(), name.getName());
+                        artist.incrementMap(artist.getBestFans(), getUsername());
+                        artist.incrementMap(artist.getListeners(), getUsername());
+                        artist.incrementMap(artist.getCities(), getCity());
                     }
                     if (name.getName().equals(currentSong)) {
                         isSongCurrentSong = true;
@@ -757,6 +778,15 @@ public final class User extends UserAbstract {
                     incrementMap(genreName, name.getGenre());
                     incrementMap(artistNames, name.getArtist());
                     incrementMap(songName, name.getName());
+                    if (artist == null) {
+                        admin.addArtist(name.getArtist());
+                        artist = admin.getArtist(name.getArtist());
+                    }
+                    artist.incrementMap(artist.getBestAlbums(), name.getAlbum());
+                    artist.incrementMap(artist.getBestSongs(), name.getName());
+                    artist.incrementMap(artist.getBestFans(), getUsername());
+                    artist.incrementMap(artist.getListeners(), getUsername());
+                    artist.incrementMap(artist.getCities(), getCity());
                     if (name.getName().equals(player.getSource().getAudioFile().getName())) {
                         exit = true;
                         break;

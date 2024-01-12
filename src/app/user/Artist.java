@@ -17,10 +17,43 @@ import lombok.Setter;
  * The type Artist.
  */
 public final class Artist extends ContentCreator {
+    /**
+     * -- GETTER --
+     *  Gets albums.
+     *
+     */
+    @Getter
     private ArrayList<Album> albums;
+    /**
+     * -- GETTER --
+     *  Gets merch.
+     *
+     */
+    @Getter
     private ArrayList<Merchandise> merch;
-    private ArrayList<Event> events;
+    /**
+     * -- GETTER --
+     *  Gets events.
+     *
+     */
+    @Getter
+    private final ArrayList<Event> events;
     private final int wrappedLimit = 5;
+    @Getter
+    @Setter
+    private Map<String, Integer> bestAlbums = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Integer> bestSongs = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Integer> bestFans = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Integer> listeners = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Integer> cities = new HashMap<>();
 
     /**
      * Instantiates a new Artist.
@@ -36,33 +69,6 @@ public final class Artist extends ContentCreator {
         events = new ArrayList<>();
 
         super.setPage(new ArtistPage(this));
-    }
-
-    /**
-     * Gets albums.
-     *
-     * @return the albums
-     */
-    public ArrayList<Album> getAlbums() {
-        return albums;
-    }
-
-    /**
-     * Gets merch.
-     *
-     * @return the merch
-     */
-    public ArrayList<Merchandise> getMerch() {
-        return merch;
-    }
-
-    /**
-     * Gets events.
-     *
-     * @return the events
-     */
-    public ArrayList<Event> getEvents() {
-        return events;
     }
 
     /**
@@ -130,6 +136,66 @@ public final class Artist extends ContentCreator {
     public ObjectNode wrapped(final CommandInput command) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
+
+        ObjectNode node = objectMapper.createObjectNode();
+        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(bestAlbums.entrySet());
+
+        entryList.sort(Map.Entry.<String, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey()));
+
+        Map<String, Integer> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        for (int i = 0; i < wrappedLimit; i++) {
+            if (sortedMap.size() <= i)
+                break;
+
+            node.put(sortedMap.keySet().toArray()[i].toString(),
+                    (Integer) sortedMap.values().toArray()[i]);
+        }
+        objectNode.set("topAlbums", node);
+
+        node = objectMapper.createObjectNode();
+        entryList = new ArrayList<>(bestSongs.entrySet());
+
+        entryList.sort(Map.Entry.<String, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey()));
+
+        sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        for (int i = 0; i < wrappedLimit; i++) {
+            if (sortedMap.size() <= i)
+                break;
+
+            node.put(sortedMap.keySet().toArray()[i].toString(),
+                    (Integer) sortedMap.values().toArray()[i]);
+        }
+        objectNode.set("topSongs", node);
+
+        ArrayNode arrNode = objectMapper.createArrayNode();
+        entryList = new ArrayList<>(bestFans.entrySet());
+
+        entryList.sort(Map.Entry.<String, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey()));
+
+        sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        for (int i = 0; i < wrappedLimit; i++) {
+            if (sortedMap.size() <= i)
+                break;
+            arrNode.add(sortedMap.keySet().toArray()[i].toString());
+        }
+
+        objectNode.set("topFans", arrNode);
+
+
+        objectNode.put("listeners", listeners.size());
+        objectNode.put("cities", cities.size());
 
 
         return objectNode;
