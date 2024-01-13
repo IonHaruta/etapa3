@@ -590,7 +590,7 @@ public final class CommandRunner {
     public static ObjectNode showPodcasts(final CommandInput commandInput) {
         Host host = admin.getHost(commandInput.getUsername());
         List<PodcastOutput> podcasts = new ArrayList<>();
-        if (host != null){
+        if (host != null) {
             podcasts = host.getPodcasts().stream().map(PodcastOutput::new).toList();
         }
 
@@ -602,7 +602,21 @@ public final class CommandRunner {
 
         return objectNode;
     }
-
+    /**
+     * Wraps the given command input into an ObjectNode containing the result of the command.
+     *
+     * @param commandInput The command input to process.
+     * @return An ObjectNode containing the result of the command,
+     * or {@code null} if the user is not found.
+     *
+     * This method takes a {@code CommandInput} object, retrieves the corresponding user,
+     * and generates an ObjectNode with information about the command result. The result includes
+     * details such as the command itself, the username, timestamp, and additional information
+     * specific to the user type (user, artist, or host). If the user is not found,
+     * the method returns
+     * {@code null}. If there is no data to show for the user, a message indicating this is included
+     * in the ObjectNode.
+     */
     public static ObjectNode wrapped(final CommandInput commandInput) {
         ObjectNode resultNode = objectMapper.createObjectNode();
         UserAbstract user = admin.getAbstractUser(commandInput.getUsername());
@@ -614,15 +628,16 @@ public final class CommandRunner {
         if (user == null) {
             return null;
         } else if (user.userType().equals("user")) {
-            resultNode = ((User)user).wrapped(commandInput);
+            resultNode = ((User) user).wrapped(commandInput);
             if (resultNode == null) {
-                objectNode.put("message", "No data to show for user " + commandInput.getUsername() + ".");
+                objectNode.put("message", "No data to show for user "
+                        + commandInput.getUsername() + ".");
                 return objectNode;
             }
         } else if (user.userType().equals("artist")) {
-            resultNode = ((Artist)user).wrapped(commandInput);
+            resultNode = ((Artist) user).wrapped(commandInput);
         } else if (user.userType().equals("host")) {
-            resultNode = ((Host)user).wrapped(commandInput);
+            resultNode = ((Host) user).wrapped(commandInput);
         }
         objectNode.put("result", resultNode);
 
@@ -808,6 +823,25 @@ public final class CommandRunner {
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("result", objectMapper.valueToTree(playlists));
+
+        return objectNode;
+    }
+    /**
+     * Ends the program and generates an ObjectNode with the result of the program termination.
+     *
+     * @return An ObjectNode containing the result of the program termination.
+     *
+     * This method invokes the {@code end} method of the {@code Admin} class to obtain a summary
+     * of artists with best fans.
+     * It then creates an ObjectNode representing the result of the program
+     * termination, including details about the command, and the summary obtained from the admin.
+     */
+    public static ObjectNode end() {
+        ObjectNode resultNode = admin.end();
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", "endProgram");
+        objectNode.put("result", resultNode);
 
         return objectNode;
     }

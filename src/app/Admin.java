@@ -59,6 +59,7 @@ public final class Admin {
     private final int dateDayHigherLimit = 31;
     private final int dateFebHigherLimit = 28;
     private static Admin instance;
+    private final int ageArtist = 69;
 
     private Admin() {
     }
@@ -105,9 +106,19 @@ public final class Admin {
                     songInput.getReleaseYear(), songInput.getArtist()));
         }
     }
-
+    /**
+     * Adds a new artist to the collection with a specified
+     * username and default values for age and location.
+     *
+     * @param username The username of the artist. Must not be null.
+     * @throws IllegalArgumentException if the provided username is null.
+     *
+     * This method creates a new {@code Artist} object with the given username, a default age,
+     * and a default location ("Bucuresti"), and adds it to the collection of artists.
+     * The username must not be null; otherwise, an {@code IllegalArgumentException} is thrown.
+     */
     public void addArtist(final String username) {
-        artists.add(new Artist(username, 69, "Bucuresti"));
+        artists.add(new Artist(username, ageArtist, "Bucuresti"));
     }
 
     /**
@@ -238,7 +249,17 @@ public final class Admin {
 
         users.forEach(user -> user.simulateTime(elapsed));
     }
-
+    /**
+     * Retrieves an abstract user based on the provided username.
+     *
+     * @param username The username of the user to retrieve.
+     * @return The {@code UserAbstract} object with the specified username,
+     *         or {@code null} if no user is found with the given username.
+     *
+     * This method searches for a user with the specified username in the combined list
+     * of regular users, artists, and hosts. It returns the first matching user,
+     * wrapped in a {@code UserAbstract} object, or {@code null} if no match is found.
+     */
     public UserAbstract getAbstractUser(final String username) {
         ArrayList<UserAbstract> allUsers = new ArrayList<>();
 
@@ -527,6 +548,39 @@ public final class Admin {
         podcasts.remove(searchedPodcast);
         return "%s deleted the podcast successfully.".formatted(username);
     }
+    /**
+     * Generates and returns an ObjectNode representing the summary of artists with best fans.
+     *
+     * @return An ObjectNode containing information about artists with best fans,
+     *         including merch revenue, song revenue, ranking, and the most profitable song.
+     *
+     * This method creates and returns a structured JSON-like ObjectNode containing
+     * summarized information about artists with best fans. The information includes
+     * merch revenue, song revenue, ranking, and the most profitable song for each artist.
+     * If an artist has no best fans, their information is omitted from the output.
+     */
+    public ObjectNode end() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode output = objectMapper.createObjectNode();
+
+        this.artists.sort(Comparator.comparing(Artist::getUsername));
+        int count = 1;
+        for (Artist artist : artists) {
+            if (!artist.getBestFans().isEmpty()) {
+                ObjectNode node = objectMapper.createObjectNode();
+
+                node.put("merchRevenue", 0.0);
+                node.put("songRevenue", 0.0);
+                node.put("ranking", count);
+                node.put("mostProfitableSong", "N/A");
+
+                output.set(artist.getUsername(), node);
+                count++;
+            }
+        }
+        return output;
+    }
+
 
     /**
      * Add event string.

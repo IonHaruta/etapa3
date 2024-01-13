@@ -22,7 +22,12 @@ import fileio.input.CommandInput;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 
 /**
  * The type User.
@@ -93,10 +98,6 @@ public final class User extends UserAbstract {
         homePage = new HomePage(this);
         currentPage = homePage;
         likedContentPage = new LikedContentPage(this);
-    }
-
-    public void getStatisticsUser(){
-
     }
 
     @Override
@@ -172,16 +173,18 @@ public final class User extends UserAbstract {
             return "Successfully selected %s.".formatted(selected.getName());
         }
     }
-
-    public void incrementMap(Map<String, Integer> map, String key) {
+    /**
+     * Increments the value associated with the specified key in the given map.
+     *
+     * @param map The map to be modified. Must not be null.
+     * @param key The key whose associated value is to be incremented. Must not be null.
+     *
+     * This method takes a map and a key as parameters, and increments the value associated
+     * with the specified key in the map. If the key is not present in the map, a new entry
+     * with the key and a value of 1 is added. If the map or key is null, the method does nothing.
+     */
+    public void incrementMap(final Map<String, Integer> map, final String key) {
         map.compute(key, (k, oldValue) -> (oldValue == null) ? 1 : oldValue + 1);
-    }
-    private static void printMap(String category, Map<String, Integer> map) {
-        System.out.println(category + ":");
-        for (Map.Entry<String, Integer> entry : map.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
-        System.out.println(); // Add an empty line for better readability
     }
     /**
      * Load string.
@@ -605,7 +608,20 @@ public final class User extends UserAbstract {
 
         return results;
     }
-
+    /**
+     * Wraps statistical information into an ObjectNode based on the provided command input.
+     *
+     * @param command The command input to process. Must not be null.
+     * @return An ObjectNode containing statistical information based on the provided command input,
+     *         or {@code null} if required data is missing.
+     *
+     * This method generates an ObjectNode containing statistical information such as top artists,
+     * genres, songs, and albums based on the provided command input. The information is derived
+     * from the data stored in various maps (artistNames, genreName, songName, albumName).
+     * The result is structured and categorized within the ObjectNode.
+     * If any required data is missing,
+     * such as empty maps, the method returns {@code null}.
+     */
     public ObjectNode wrapped(final CommandInput command) {
         if (artistNames.isEmpty() || genreName.isEmpty() || songName.isEmpty()
                 || albumName.isEmpty()) {
@@ -625,9 +641,9 @@ public final class User extends UserAbstract {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         for (int i = 0; i < wrappedLimit; i++) {
-            if (sortedMap.size() <= i)
+            if (sortedMap.size() <= i) {
                 break;
-
+            }
             node.put(sortedMap.keySet().toArray()[i].toString(),
                     (Integer) sortedMap.values().toArray()[i]);
         }
@@ -645,9 +661,9 @@ public final class User extends UserAbstract {
             sortedMap1.put(entry.getKey(), entry.getValue());
         }
         for (int i = 0; i < wrappedLimit; i++) {
-            if (sortedMap1.size() <= i)
+            if (sortedMap1.size() <= i) {
                 break;
-
+            }
             node1.put(sortedMap1.keySet().toArray()[i].toString(),
                     (Integer) sortedMap1.values().toArray()[i]);
         }
@@ -664,9 +680,9 @@ public final class User extends UserAbstract {
             sortedMap2.put(entry.getKey(), entry.getValue());
         }
         for (int i = 0; i < wrappedLimit; i++) {
-            if (sortedMap2.size() <= i)
+            if (sortedMap2.size() <= i) {
                 break;
-
+            }
             node2.put(sortedMap2.keySet().toArray()[i].toString(),
                     (Integer) sortedMap2.values().toArray()[i]);
         }
@@ -683,9 +699,9 @@ public final class User extends UserAbstract {
             sortedMap3.put(entry.getKey(), entry.getValue());
         }
         for (int i = 0; i < wrappedLimit; i++) {
-            if (sortedMap3.size() <= i)
+            if (sortedMap3.size() <= i) {
                 break;
-
+            }
             node3.put(sortedMap3.keySet().toArray()[i].toString(),
                     (Integer) sortedMap3.values().toArray()[i]);
         }

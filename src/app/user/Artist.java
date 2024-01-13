@@ -1,6 +1,6 @@
 package app.user;
 
-import java.util.*;
+
 
 import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
@@ -13,31 +13,19 @@ import fileio.input.CommandInput;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 /**
  * The type Artist.
  */
 public final class Artist extends ContentCreator {
-    /**
-     * -- GETTER --
-     *  Gets albums.
-     *
-     */
-    @Getter
     private ArrayList<Album> albums;
-    /**
-     * -- GETTER --
-     *  Gets merch.
-     *
-     */
-    @Getter
     private ArrayList<Merchandise> merch;
-    /**
-     * -- GETTER --
-     *  Gets events.
-     *
-     */
-    @Getter
-    private final ArrayList<Event> events;
+    private ArrayList<Event> events;
     private final int wrappedLimit = 5;
     @Getter
     @Setter
@@ -72,6 +60,33 @@ public final class Artist extends ContentCreator {
     }
 
     /**
+     * Gets albums.
+     *
+     * @return the albums
+     */
+    public ArrayList<Album> getAlbums() {
+        return albums;
+    }
+
+    /**
+     * Gets merch.
+     *
+     * @return the merch
+     */
+    public ArrayList<Merchandise> getMerch() {
+        return merch;
+    }
+
+    /**
+     * Gets events.
+     *
+     * @return the events
+     */
+    public ArrayList<Event> getEvents() {
+        return events;
+    }
+
+    /**
      * Gets event.
      *
      * @param eventName the event name
@@ -86,8 +101,17 @@ public final class Artist extends ContentCreator {
 
         return null;
     }
-
-    public void incrementMap(Map<String, Integer> map, String key) {
+    /**
+     * Increments the value associated with the specified key in the given map.
+     *
+     * @param map The map to be modified. Must not be null.
+     * @param key The key whose associated value is to be incremented. Must not be null.
+     *
+     * This method takes a map and a key as parameters, and increments the value associated
+     * with the specified key in the map. If the key is not present in the map, a new entry
+     * with the key and a value of 1 is added. If the map or key is null, the method does nothing.
+     */
+    public void incrementMap(final Map<String, Integer> map, final String key) {
         map.compute(key, (k, oldValue) -> (oldValue == null) ? 1 : oldValue + 1);
     }
 
@@ -132,7 +156,20 @@ public final class Artist extends ContentCreator {
 
         return albumOutput;
     }
-
+    /**
+     * Wraps statistical information into an ObjectNode based on the provided command input.
+     *
+     * @param command The command input to process. Must not be null.
+     * @return An ObjectNode containing statistical information based on the provided command input.
+     *
+     * This method generates an ObjectNode containing statistical information, such as top albums,
+     * top songs, top fans, listener count, and city count, based on the provided command input.
+     * The information is derived from the data stored in
+     * various maps and sets (bestAlbums, bestSongs,
+     * bestFans, listeners, cities). The result is structured and categorized within the ObjectNode.
+     * If any required data is missing or the command input is null,
+     * the method returns an empty ObjectNode.
+     */
     public ObjectNode wrapped(final CommandInput command) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -148,9 +185,9 @@ public final class Artist extends ContentCreator {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         for (int i = 0; i < wrappedLimit; i++) {
-            if (sortedMap.size() <= i)
+            if (sortedMap.size() <= i) {
                 break;
-
+            }
             node.put(sortedMap.keySet().toArray()[i].toString(),
                     (Integer) sortedMap.values().toArray()[i]);
         }
@@ -167,9 +204,9 @@ public final class Artist extends ContentCreator {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         for (int i = 0; i < wrappedLimit; i++) {
-            if (sortedMap.size() <= i)
+            if (sortedMap.size() <= i) {
                 break;
-
+            }
             node.put(sortedMap.keySet().toArray()[i].toString(),
                     (Integer) sortedMap.values().toArray()[i]);
         }
@@ -186,8 +223,9 @@ public final class Artist extends ContentCreator {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         for (int i = 0; i < wrappedLimit; i++) {
-            if (sortedMap.size() <= i)
+            if (sortedMap.size() <= i) {
                 break;
+            }
             arrNode.add(sortedMap.keySet().toArray()[i].toString());
         }
 

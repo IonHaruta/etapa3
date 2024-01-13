@@ -96,7 +96,15 @@ public final class Host extends ContentCreator {
 
         return null;
     }
-
+    /**
+     * Returns a null ObjectNode.
+     *
+     * @param command The command input. This parameter is ignored.
+     * @return Always returns {@code null}.
+     *
+     * This method is designed to return a null ObjectNode. It takes a command input as a parameter,
+     * but the parameter is ignored, and the method always returns {@code null}.
+     */
     public ObjectNode wrapped(final CommandInput command) {
         return null;
     }

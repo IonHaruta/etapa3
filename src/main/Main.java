@@ -140,6 +140,7 @@ public final class Main {
                 default -> System.out.println("Invalid command " + commandName);
             }
         }
+        outputs.add(CommandRunner.end());
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), outputs);
