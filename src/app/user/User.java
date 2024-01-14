@@ -614,7 +614,6 @@ public final class User extends UserAbstract {
      * @param command The command input to process. Must not be null.
      * @return An ObjectNode containing statistical information based on the provided command input,
      *         or {@code null} if required data is missing.
-     *
      * This method generates an ObjectNode containing statistical information such as top artists,
      * genres, songs, and albums based on the provided command input. The information is derived
      * from the data stored in various maps (artistNames, genreName, songName, albumName).
@@ -708,7 +707,7 @@ public final class User extends UserAbstract {
         objectNode.set("topAlbums", node3);
 
         ObjectNode node4 = objectMapper.createObjectNode();
-        objectNode.set("topPodcasts", node4);
+        objectNode.set("topEpisodes", node4);
         return objectNode;
     }
 

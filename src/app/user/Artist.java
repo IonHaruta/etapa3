@@ -233,7 +233,6 @@ public final class Artist extends ContentCreator {
 
 
         objectNode.put("listeners", listeners.size());
-        objectNode.put("cities", cities.size());
 
 
         return objectNode;
